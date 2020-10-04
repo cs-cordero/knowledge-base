@@ -1,0 +1,10 @@
+[book]
+authors = ["Christopher Cordero"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Knowledge Base"
+
+[output.html]
+additional-css = ["theme/custom.css"]
+site-url = "/kb/"

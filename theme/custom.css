@@ -1,0 +1,21 @@
+#back-to-blog {
+    font-size: 1.25em;
+}
+
+#back-to-blog-container {
+    display: flex;
+}
+
+#back-to-blog-text {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    margin-left: 5px;
+}
+
+#back-to-blog-img {
+    display: flex;
+    margin-top: 10px;
+    width: 30px;
+    height: 30px;
+}
