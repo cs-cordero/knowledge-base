@@ -78,6 +78,9 @@ confirm "Proceed?"
 echo
 
 mdbook build
-ssh "$HOSTNAME" "rm -r $SCP_LOCATION"
-ssh "$HOSTNAME" "mkdir -p $SCP_LOCATION"
-scp -r book/* "$HOSTNAME:$SCP_LOCATION"
+ssh "$HOSTNAME" "rm $SCP_LOCATION/*.html"
+ssh "$HOSTNAME" "rm $SCP_LOCATION/searchindex.js"
+ssh "$HOSTNAME" "rm $SCP_LOCATION/searchindex.json"
+scp book/*.html "$HOSTNAME:$SCP_LOCATION"
+scp book/searchindex.js "$HOSTNAME:$SCP_LOCATION"
+scp book/searchindex.json "$HOSTNAME:$SCP_LOCATION"
