@@ -9,3 +9,4 @@
 - [std140 Layout](std140.md)
 - [C-style data layout and alignment](c_data_alignment.md)
 - [Shaders](shaders.md)
+- [Memory Management](memory_management.md)
