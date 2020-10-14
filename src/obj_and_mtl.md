@@ -36,6 +36,7 @@ See:
 
 When the `map_Ka`, `map_Kd`, and `map_Ks` texture maps are used, after getting the RGB color using a 2D sampler, the RGB values should be component-wise multiplied against the material RGB colors for `Ka`, `Kd`, and `Ks` respectively.
 
+### Vertex Normals vs. Normal Maps
 When the `map_Bump` exists and is used to calculate normal vectors, their values _replace_ the vertex normals (and the interpolated vertex normal values per fragment).
 
 The vertex normals are still useful for calculating the `tangent space to world space` transformation matrix.  
