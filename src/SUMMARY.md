@@ -11,6 +11,7 @@
 - [OBJ and MTL files](obj_and_mtl.md)
 - [Performance](performance.md)
 - [Shaders & GLSL](shaders.md)
+- [Debugging Shaders](shader_debugging.md)
 - [Std140 Layout](std140.md)
 - [Textures](textures.md)
 
