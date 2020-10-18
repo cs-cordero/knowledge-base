@@ -1,6 +1,12 @@
 # Vectors
 Vectors are a foundational mathematical component to any 3D game engine.
 
+See:
+* [Quora: What is a pseudovector?](https://qr.ae/pNuwO2)
+* [https://stackoverflow.com/https://en.wikipedia.org/wiki/Cross_product#Cross_product_and_handednessa/4820904/6602445](https://stackoverflow.com/a/4820904/6602445)
+* [https://en.wikipedia.org/wiki/Cross_product#Cross_product_and_handedness](https://en.wikipedia.org/wiki/Cross_product#Cross_product_and_handedness)
+* [https://www.reddit.com/r/askscience/comments/3rijds/why_does_the_righthandrule_for_vector/](https://www.reddit.com/r/askscience/comments/3rijds/why_does_the_righthandrule_for_vector/)
+
 ## Base Notation
 
 Vectors take the following notation:

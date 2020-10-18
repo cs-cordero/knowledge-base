@@ -1,6 +1,10 @@
 # Matrices
 Matrices are a foundational mathematical component to any 3D game engine.
 
+See:
+* [https://www.reddit.com/r/gamedev/comments/jd0c3m/game_engine_math_why_is_the_reduced_form_of_a/](https://www.reddit.com/r/gamedev/comments/jd0c3m/game_engine_math_why_is_the_reduced_form_of_a/)
+* [https://www.reddit.com/r/gameenginedevs/comments/jd0aui/game_engine_math_why_is_the_reduced_form_of_a/](https://www.reddit.com/r/gameenginedevs/comments/jd0aui/game_engine_math_why_is_the_reduced_form_of_a/)
+
 ## Base Notation
 
 Matrices take the following notation:

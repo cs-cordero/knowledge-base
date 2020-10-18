@@ -1,5 +1,12 @@
 # Matrix Transformations
+
 In order to transform a set of vectors from one coordinate space to another, we can perform _linear transformations_ (scales, translations, and rotations) among different Cartesian coordinate frames.
+
+See:
+* [https://www.evl.uic.edu/ralph/508S98/coordinates.html](https://www.evl.uic.edu/ralph/508S98/coordinates.html)
+* [https://stackoverflow.com/questions/19747082/how-does-coordinate-system-handedness-relate-to-rotation-direction-and-vertices](https://stackoverflow.com/questions/19747082/how-does-coordinate-system-handedness-relate-to-rotation-direction-and-vertices)
+* [http://www.f-lohmueller.de/pov_tut/a_geo/a_geo85e.htm](http://www.f-lohmueller.de/pov_tut/a_geo/a_geo85e.htm)
+* [https://www.reddit.com/r/gameenginedevs/comments/jd6oz0/very_confused_about_lefthanded_vs_righthanded/](https://www.reddit.com/r/gameenginedevs/comments/jd6oz0/very_confused_about_lefthanded_vs_righthanded/)
 
 ## Coordinate Systems
 A coordinate system \\( C \\) consists of an origin and three coordinate axes.  Points have coordinates \\( \langle x, y, z \rangle \\).  You can think of a point's coordinates as the distance to travel along each coordinate axis from the origin to reach the point.
