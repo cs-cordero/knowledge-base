@@ -27,6 +27,7 @@ Use the `publish.sh` script to `scp` the static files to your remote server.
 
 #### Notes
 * The hostname should either be the exact IP address of your remote server or a hostname configured in `~/.ssh/config`.
+* [MathJax Cheatsheet](https://math.meta.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference)
 
 ## Author
 

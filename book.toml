@@ -7,4 +7,5 @@ title = "Knowledge Base"
 
 [output.html]
 additional-css = ["theme/custom.css"]
+mathjax-support = true
 site-url = "/kb/"

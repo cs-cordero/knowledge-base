@@ -17,5 +17,11 @@
 - [Textures](textures.md)
 - [User Inputs](game_inputs.md)
 
+# Linear Algebra
+- [Vectors](vectors.md)
+- [Matrices](matrices.md)
+    - [Matrix Transformations](matrix_transforms.md)
+- [Quaternions](quaternions.md)
+
 # Java
 - [Unhandled Exceptions](java_unhandled_exceptions.md)
