@@ -5,6 +5,7 @@ See:
 * [https://www.youtube.com/watch?v=PnazRFnPPcg](https://www.youtube.com/watch?v=PnazRFnPPcg)
 * [http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-13-normal-mapping/](http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-13-normal-mapping/)
 * [https://sotrh.github.io/learn-wgpu/intermediate/tutorial11-normals/#the-tangent-and-the-bitangent](https://sotrh.github.io/learn-wgpu/intermediate/tutorial11-normals/#the-tangent-and-the-bitangent)
+* [https://learnopengl.com/Advanced-Lighting/Normal-Mapping](https://learnopengl.com/Advanced-Lighting/Normal-Mapping)
 
 ### Normal Vectors
 The "normal" in geometry is a vector that is perpendicular to a given object.  They are primarily used in light calculations, for example to calculate the _diffuse reflection_ across a surface, which involves taking the dot product between the light direction and a surface normal.

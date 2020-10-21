@@ -8,6 +8,8 @@
 - [Engine Configuration](engine_configuration.md)
 - [Engine File Systems](engine_fs.md)
 - [Game Loops and Time](game_loop.md)
+- [Lighting and Shading](lighting_shading.md)
+    - [Shading Models](shading_models.md)
 - [Memory Management](memory_management.md)
 - [Normal Maps](normal_map.md)
 - [OBJ and MTL files](obj_and_mtl.md)
