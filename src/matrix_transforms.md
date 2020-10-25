@@ -3,6 +3,8 @@
 In order to transform a set of vectors from one coordinate space to another, we can perform _linear transformations_ (scales, translations, and rotations) among different Cartesian coordinate frames.
 
 See:
+* [https://docs.microsoft.com/en-us/windows/win32/direct3d9/transforms](https://docs.microsoft.com/en-us/windows/win32/direct3d9/transforms)
+* [https://gamedev.stackexchange.com/questions/57474/tbn-matrix-eye-vs-world-space-conflict](https://gamedev.stackexchange.com/questions/57474/tbn-matrix-eye-vs-world-space-conflict)
 * [https://www.evl.uic.edu/ralph/508S98/coordinates.html](https://www.evl.uic.edu/ralph/508S98/coordinates.html)
 * [https://stackoverflow.com/questions/19747082/how-does-coordinate-system-handedness-relate-to-rotation-direction-and-vertices](https://stackoverflow.com/questions/19747082/how-does-coordinate-system-handedness-relate-to-rotation-direction-and-vertices)
 * [http://www.f-lohmueller.de/pov_tut/a_geo/a_geo85e.htm](http://www.f-lohmueller.de/pov_tut/a_geo/a_geo85e.htm)

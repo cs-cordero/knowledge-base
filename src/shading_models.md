@@ -29,12 +29,24 @@ The Blinn-Phong model takes the vertex normal \\(\vec{N}\\), the direction to a 
 > \\[
     \kappa = \kappa_{\text{emission}} + \kappa_{\text{diffuse}} + \kappa_{\text{specular}} \\\\
     = \varepsilon \mathit{M} + \mathit{D} \mathit{T} \mathit{A} + \sum_{i=1}^n C_i
-    \left[ \mathit{D} \mathit{T} \left( \vec{N} \cdot \vec{L_i} \right) + \mathit{S} \mathit{G} \left( \vec{N} \cdot \vec{H_i} \right)^m \left( \vec{N} \cdot \vec{L_i} \gt 0 \right)  \right]
+    \left[ \mathit{D} \mathit{T} \max \left\\{ \vec{N} \cdot \vec{L_i}, 0 \right\\} + \mathit{S} \mathit{G} \max \left\\{ \vec{N} \cdot \vec{H_i}, 0 \right\\}^m \left( \vec{N} \cdot \vec{L_i} \gt 0 \right)  \right]
 \\]
 >
 > Where:
-> * The diffuse and specular dot products are clamped to zero.
-> * The interpolated normal vectors do not retain the unit length they have at their vertices.
+> * The diffuse and specular dot products are clamped to zero
+> * The interpolated normal vectors do not retain the unit length they have at their vertices
+> * \\(\varepsilon\\) is the emission color of the surface
+> * \\(D\\) is the diffuse reflection color of the surface
+> * \\(S\\) is the specular reflection color of the surface
+> * \\(m\\) is the specular exponent color of the surface
+> * \\(\vec{N}\\) is the normal of the surface
+> * \\(M\\) is the emission sample from an emission map, if any, or 1.0
+> * \\(G\\) is the specular sample from a gloss map, if any, or 1.0
+> * \\(T\\) is the diffuse sample from a texture map, if any, or 1.0
+> * \\(\vec{L_i}\\) is the vector pointing in the direction of light source \\(i\\)
+> * \\(C_i\\) is the color of light source \\(i\\)
+> * \\(\vec{H_i}\\) is the halfway vector for light source \\(i\\):
+> \\[ \vec{H_i} = \frac{\vec{L_i} + \vec{V}}{\lVert \vec{L_i} + \vec{V} \rVert} \\]
 
 To solve issue with the fact that normal vectors don't retain the unit-length at their vertices, we can explicitly normalize them in the fragment shader or use a normalization cube map.
 
@@ -93,3 +105,4 @@ After that, we can invert the matrix to form our `model_to_tangent_space` matrix
 \\[ M_{\text{tangent} \rightarrow \text{model}} = \begin{bmatrix} T_x' & B_x' & N_x' \\\\ T_y' & B_y' & N_y' \\\\ T_z' & B_z' & N_z'\end{bmatrix} \\]
 
 \\[ \left( M_{\text{tangent} \rightarrow \text{model}} \right)^{-1} = \left( M_{\text{tangent} \rightarrow \text{model}} \right)^{T} = M_{\text{model} \rightarrow \text{tangent}} = \begin{bmatrix} T_x' & T_y' & T_z' \\\\ B_x' & B_y' & B_z' \\\\ N_x' & N_y' & N_z'\end{bmatrix} \\]
+
