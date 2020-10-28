@@ -10,8 +10,48 @@ See:
 * [http://www.f-lohmueller.de/pov_tut/a_geo/a_geo85e.htm](http://www.f-lohmueller.de/pov_tut/a_geo/a_geo85e.htm)
 * [https://www.reddit.com/r/gameenginedevs/comments/jd6oz0/very_confused_about_lefthanded_vs_righthanded/](https://www.reddit.com/r/gameenginedevs/comments/jd6oz0/very_confused_about_lefthanded_vs_righthanded/)
 
+## Handedness
+A left-handed matrix transform has the following shape:
+\\[
+    \begin{bmatrix}
+        U_x & U_y & U_z & 0 \\\\
+        V_x & V_y & V_z & 0 \\\\
+        W_x & W_y & W_z & 0 \\\\
+        T_x & T_y & T_z & 1
+    \end{bmatrix}
+\\]
+
+Whereas a right-handed matrix transform has the following shape:
+\\[
+    \begin{bmatrix}
+        U_x & V_x & W_x & T_x \\\\
+        U_y & V_y & W_y & T_y \\\\
+        U_z & V_z & W_z & T_z \\\\
+        0 & 0 & 0 & 1
+    \end{bmatrix}
+\\]
+
+In the above matrices, the vectors \\(\vec{U}\\), \\(\vec{V}\\), \\(\vec{W}\\) represent the basis vectors in the resulting coordinate system as it appears to the source coordinate system.  Together they constitute how the vector is to be _rotated_.
+
+The vector \\(\vec{T}\\) represents a _translation_.
+
+### How to apply matrix transforms to a vector
+Order matters when transforming a vector using a matrix because the operation is not commutative.
+
+In other words:  \\(\vec{V} \times M \ne M \times \vec{V}\\)
+
+**WHEN THE TRANSFORM MATRIX IS LEFT-HANDED, THE VECTOR GOES ON THE LEFT SIDE**
+\\[\vec{V'} = \vec{V} \times M_{LH}\\]
+
+**WHEN THE TRANSFORM MATRIX IS RIGHT-HANDED, THE VECTOR GOES ON THE RIGHT SIDE**
+\\[\vec{V'} = M_{RH} \times \vec{V}\\]
+
 ## Coordinate Systems
 A coordinate system \\( C \\) consists of an origin and three coordinate axes.  Points have coordinates \\( \langle x, y, z \rangle \\).  You can think of a point's coordinates as the distance to travel along each coordinate axis from the origin to reach the point.
+
+A transformation matrix converts vectors from a _source_ space \\( A \\) to _target_ space \\( B \\).  As explained above and below, the \\(\vec{U}\\), \\(\vec{V}\\), \\(\vec{W}\\) vectors represent the basis vectors of space \\(B\\) as it appears when viewing them from space \\(A\\).
+
+You can construct any such transformation matrix on your own; the coordinate space that the \\(\vec{U}\\), \\(\vec{V}\\), \\(\vec{W}\\) vectors are defined in dictate what target space the transformation matrix transforms vectors into.
 
 ## Linear Transformations
 If you have a \\( C \\), you could also have \\( C' \\), which is a second coordinate system with coordinates \\( \langle x', y', z' \rangle \\) that _can be expressed as linear functions of coordinates \\( \langle x, y, z \rangle \\) in \\( C \\).
@@ -124,6 +164,34 @@ _A_ is the arbitrary axis around which to rotate.
 \\]
 where \\( c = cos \theta \\) and \\( s = sin \theta \\)
 
+#### Rotations depend on the handedness of your coordinate system!
+The above formulas assume a _right-handed_ coordinate system.
+
+The following are the **left-handed equivalents**:
+
+\\[
+    \vec{R}_x(\theta) = \begin{bmatrix}
+        1 & 0 & 0 \\\\
+        0 & cos \theta & sin \theta \\\\
+        0 & -sin \theta & cos \theta
+    \end{bmatrix}
+\\]
+\\[
+    \vec{R}_y(\theta) = \begin{bmatrix}
+        cos \theta & 0 & -sin \theta \\\\
+        0 & 1 & 0 \\\\
+        sin \theta & 0 & cos \theta
+    \end{bmatrix}
+\\]
+\\[
+    \vec{R}_z(\theta) = \begin{bmatrix}
+        cos \theta & sin \theta & 0 \\\\
+        -sin \theta & cos \theta & 0 \\\\
+        0 & 0 & 1
+    \end{bmatrix}
+\\]
+
+
 ## Homogenous Coordinates
 Without utilizing 4D coordinates (and thereby homogenous coordinates), in order to both rotate/scale _and_ translate a vector, we'd have to do something like this:
 
@@ -152,3 +220,77 @@ To convert a _point_ from its homogenous coordinates back into its 3D vector.
 You have to be careful when transforming a normal vector.
 * Normals should be unaffected by translations.
 * When a _nonorthogonal_ matrix transforms a normal vector, it may result in a direction that is no longer perpendicular to the surface.
+
+
+## Matrix Concatenation
+Matrix concatenation goes from left to right.
+
+Given a transformation matrix \\(A\\) and a transformation matrix \\(B\\):
+
+\\(AB\\) results in a transformation matrix that encodes the combined effect of first applying matrix A to a vector, followed by applying matrix B.
+
+\\(BA\\) has the opposite effect: it encodes the effect of applying matrix B, followed by applying matrix A.
+
+And of course, since matrix multiplication is **not commutative**, \\(AB \ne BA \\).
+
+> **Example**
+>
+> _Given:_
+>
+> Matrix A is a 90 degree rotation about the y-axis (left-handed).
+> \\[A = \begin{bmatrix}
+>   0 & 0 & -1 & 0 \\\\
+>   0 & 1 & 0 & 0 \\\\
+>   1 & 0 & 0 & 0 \\\\
+>   0 & 0 & 0 & 1
+> \end{bmatrix}\\]
+>
+> Matrix B is a translation (left-handed).
+>
+> \\[B = \begin{bmatrix}
+>   1 & 0 & 0 & 0 \\\\
+>   0 & 1 & 0 & 0 \\\\
+>   0 & 0 & 1 & 0 \\\\
+>   3 & 4 & 5 & 1
+> \end{bmatrix}\\]
+>
+> Therefore:
+> \\[AB = \begin{bmatrix}
+>   0 & 0 & -1 & 0 \\\\
+>   0 & 1 & 0 & 0 \\\\
+>   1 & 0 & 0 & 0 \\\\
+>   0 & 0 & 0 & 1
+> \end{bmatrix}
+> \begin{bmatrix}
+>   1 & 0 & 0 & 0 \\\\
+>   0 & 1 & 0 & 0 \\\\
+>   0 & 0 & 1 & 0 \\\\
+>   3 & 4 & 5 & 1
+> \end{bmatrix}
+> = \begin{bmatrix}
+>   0 & 0 & -1 & 0 \\\\
+>   0 & 1 & 0 & 0 \\\\
+>   1 & 0 & 0 & 0 \\\\
+>   3 & 4 & 5 & 1
+> \end{bmatrix}
+>\\]
+>
+> \\[BA = \begin{bmatrix}
+>   1 & 0 & 0 & 0 \\\\
+>   0 & 1 & 0 & 0 \\\\
+>   0 & 0 & 1 & 0 \\\\
+>   3 & 4 & 5 & 1
+> \end{bmatrix}
+> \begin{bmatrix}
+>   0 & 0 & -1 & 0 \\\\
+>   0 & 1 & 0 & 0 \\\\
+>   1 & 0 & 0 & 0 \\\\
+>   0 & 0 & 0 & 1
+> \end{bmatrix}
+> = \begin{bmatrix}
+>   0 & 0 & -1 & 0 \\\\
+>   0 & 1 & 0 & 0 \\\\
+>   1 & 0 & 0 & 0 \\\\
+>   5 & 4 & -3 & 1
+> \end{bmatrix}
+>\\]

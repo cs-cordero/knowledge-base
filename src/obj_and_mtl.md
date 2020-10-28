@@ -28,6 +28,7 @@ See:
 |`Ns`| The specular exponent of the material. f32 format in range [0, 1000]. |
 |`d`| Dissolved (transparency).  f32 in the inclusive range [0, 1]. 1 means fully opaque. |
 |`Tr`| The inverse of `d`: `1.0 - d`.  Transparency.
+|`Ni`| The optical density (AKA index of refraction) of the material.  This is a property of transparent surfaces. This value is likely used in physical reflection models.)
 |`map_Ka`| The ambient texture map.
 |`map_Kd`| The diffuse texture map (usually the same as ambient texture map).
 |`map_Ks`| The specular texture map.

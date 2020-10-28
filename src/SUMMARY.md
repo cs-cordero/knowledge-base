@@ -9,6 +9,7 @@
 - [Engine File Systems](engine_fs.md)
 - [Game Loops and Time](game_loop.md)
 - [Lighting and Shading](lighting_shading.md)
+    - [Linear vs sRGB](linear_and_srgb.md)
     - [Shading Models](shading_models.md)
     - [Physical Reflection Models](physical_reflection_models.md)
 - [Memory Management](memory_management.md)
@@ -18,6 +19,8 @@
 - [Shaders & GLSL](shaders.md)
 - [Std140 Layout](std140.md)
 - [Textures](textures.md)
+    - [Mipmapping](mipmapping.md)
+    - [WGPU TextureFormats](texture_formats.md)
 - [User Inputs](game_inputs.md)
 
 # Linear Algebra
