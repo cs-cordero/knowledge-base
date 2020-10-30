@@ -64,10 +64,19 @@ You may perform _elementary row operations_ on an augmented matrix in an effort 
 * Add a multiple of one row to another row.
 
 ## Matrix Determinants
-The determinant of a square matrix is a scalar quantity computed from the matrix's elements and is denoted \\( \text{det}\\, A \\; \text{or} \\; \lvert A \rvert \\).
+Imagine the basis vectors \\(\hat{i}\\), \\(\hat{j}\\), and \\(\hat{k}\\).  If you draw a cube that these vectors create, they form a 1x1x1 sized cube.
 
-Geometrically, it can be viewed as the _volume scaling factor_ of the linear
-transformation described by the matrix.
+Matrices perform linear transformations. Linear transformations manipulate linear space itself, stretching it and or squishing it.  As a result of a transformation applied to your basis vectors, the cube it once held may change shape into a parallelepiped. Its volume may also change.
+
+The **determinant** is the scalar value that scales the volume of the cube that your basis vectors originally "created".  A determinant of 2 means that the same volume of space has scaled up 2x.  A determinant of < 1 but > 0 means that the space is squishing into something smaller.
+
+In this way, the determinant can be viewed as the _volume scaling factor_ of the linear transformation described by the matrix.
+
+A determinant of 0 means that at least two of the basis vectors have collapsed in a way such that the volume of the cube or parallelepiped they create is also 0.  This implies that at the set of vectors is linearly dependent.
+
+A negative determinant indicates that the orientation of the basis vectors has flipped.  The absolute value of the determinant continues to have the same meaning as above.
+
+Mathematically, the determinant of a square matrix is a scalar quantity computed from the matrix's elements and is denoted \\( \text{det}\\, A \\; \text{or} \\; \lvert A \rvert \\).
 
 For a 2x2 matrix:
 
