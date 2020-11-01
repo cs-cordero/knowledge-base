@@ -3,6 +3,7 @@
 [Introduction](introduction.md)
 
 # Game Engine Programming
+- [Animation Systems](animation.md)
 - [C-style data layout and alignment](c_data_alignment.md)
 - [Debugging Shaders](shader_debugging.md)
 - [Engine Configuration](engine_configuration.md)
@@ -28,6 +29,9 @@
 - [Matrices](matrices.md)
     - [Matrix Transformations](matrix_transforms.md)
 - [Quaternions](quaternions.md)
+- [Ray Tracing](ray_tracing.md)
+    - [Ray vs Surface Calculations](ray_intersections.md)
+    - [Reflections and Refractions](ray_reflections_refractions.md)
 
 # Java
 - [Unhandled Exceptions](java_unhandled_exceptions.md)
