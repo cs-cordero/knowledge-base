@@ -4,6 +4,8 @@
 
 # Game Engine Programming
 - [Animation Systems](animation.md)
+    - [Skinning](animation_skinning.md)
+    - [Blending](animation_blending.md)
 - [C-style data layout and alignment](c_data_alignment.md)
 - [Debugging Shaders](shader_debugging.md)
 - [Engine Configuration](engine_configuration.md)
