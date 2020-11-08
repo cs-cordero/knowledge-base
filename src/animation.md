@@ -192,3 +192,26 @@ struct AnimationClip {
 }
 ```
 
+### Animation Pipelines
+For every animating object in the game, the animation pipeline must take one or more animation clips and corresponding blending factors, performs the blending process, then generates a single local skeletal pose as output.
+
+1. Clip decompression and pose extraction
+    * Each individual's clip's data is decompressed and a static pose is extracted for a given time index.
+    * Output: A local skeletal pose for each input clip.  This pose could either be a full-body pose (all joints), a partial pose, or a difference pose (for additive blending).
+2. Pose blending
+    * All input poses are combined via full-body LERP, partial-skeleton LERP, and/or additive blending.
+    * Output: A single local pose for all joints in the skeleton.  If only one animation clip is being used, then this would be the same as the output of step 1.
+3. Global pose generation
+    * The input pose is walked, the joint poses are concatenated to generate a global pose for the skeleton.
+    * Output: a global pose for the skeleton.
+4. Post-processing
+    * Input: local poses and/or global poses
+    * We can perform inverse-kinematics, rag doll physics or other adjustments at this point.
+    * Output: local poses and/or global poses
+5. Recalculation of global poses
+    * If the post-processing step required a global pose, the adjustments may have transformed them in a way that we would need to repeat step 3 and walk the skeletal hierarchy to regenerate the global poses.
+    * Output: final global pose and/or final local pose
+    * Gameplay systems may be _very_ interested in using these global poses.
+6. Matrix palette generation
+    * Each joint's global pose matrix is multiplied by the corresponding inverse bind pose matrix.
+    * Output: A palette of skinning matrices suitable for input to the rendering engine.

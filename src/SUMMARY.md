@@ -6,6 +6,8 @@
 - [Animation Systems](animation.md)
     - [Skinning](animation_skinning.md)
     - [Blending](animation_blending.md)
+    - [Compression](animation_compression.md)
+    - [Action State Machines](animation_asm.md)
 - [C-style data layout and alignment](c_data_alignment.md)
 - [Debugging Shaders](shader_debugging.md)
 - [Engine Configuration](engine_configuration.md)
