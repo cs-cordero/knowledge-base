@@ -8,6 +8,7 @@
     - [Blending](animation_blending.md)
     - [Compression](animation_compression.md)
     - [Action State Machines](animation_asm.md)
+    - [Constraints](animation_constraints.md)
 - [C-style data layout and alignment](c_data_alignment.md)
 - [Debugging Shaders](shader_debugging.md)
 - [Engine Configuration](engine_configuration.md)
