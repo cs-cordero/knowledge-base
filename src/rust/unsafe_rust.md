@@ -6,9 +6,9 @@ Unsafe code is not a way to get away with skirting the various rules of Rust lik
 
 Unsafe code is not a way to get around the borrow checker.
 
-Unsafe code is not a way to get around the borrow checker (one more time).
+Unsafe code is not a way to get around the borrow checker. (one more time)
 
-Unsafe code is not a way to get around the borrow check (last time.)
+Unsafe code is not a way to get around the borrow checker. (last time)
 
 `unsafe` (the keyword) marks a particular function as unsafe to call _and_ it enables you to invoke unsafe functionality in a given code block.
 
@@ -232,4 +232,118 @@ In the above example, we call `Vec::set_len` _before_ filling the that new space
 If the call to `T::default()` panics for some reason, then the code would start unwinding before all of that extra space is initialized.
 
 Eventually the `Vec` instance will be dropped, and the `Drop::drop` implementation will try to free the uninitialized memory since it will try to free the size of its length.
+
+## Drop Checks can impact your code if you implement `Drop::drop`
+
+Since `Drop::drop` requires a mutable borrow of the value, i.e., `&mut self`, there must be a valid exclusive flow to the drop.
+
+```rust
+let mut x = true;
+let foo = Foo(&mut x);
+x = false;
+```
+
+If `Foo` in the above does NOT implement `Drop::drop`, then this code would compile because the compiler knows that the exclusive borrow in `Foo` is not used again (there are no outward flows extending from it).
+
+If `Foo` _did_ implement `Drop::drop`, there is an implicit call too `foo.drop`, which borrows `&mut self`.  As a result, there would be an exclusive flow drawn from the `foo` to its `drop`.
+
+> However, **for a generic type to soundly implement drop, its generics arguments must strictly outlive it.**
+> 
+> https://doc.rust-lang.org/nomicon/dropck.html
+
+> A generic Type<T> that manually implements Drop should consider whether a #[may_dangle] attribute is appropriate on T.
+> 
+> https://forge.rust-lang.org/libs/maintaining-std.html#is-there-a-manual-drop-implementation
+
+## `repr(Rust)` structs have no guarantees on the layout of a struct in memory
+
+Even if we're talking about a generic type `T<G>` - if you have a `T<A>` and a `T<B>`, they are not guaranteed to have the same representation in memory!
+
+As a result, even if a type `T` and a type `U` have the same fields of the same type and the same order, they are not safe to cast a `T` to a `U` or vice versa.
+
+- Even if `T` and `U` are guaranteed to have the same in-memory representation, i.e., you specified `repr(C)`, you will run into the same issue if these types are nested in another type.
+    - `UnsafeCell<T>` and `MaybeUninit<T>` can be casted there and back again safely, but safety goes out the window once you have a `Option<MaybeUninit<T>>`.
+    - Optimizations (like niche optimization) could affect the memory layout enough to no longer let this casting be safe.
+    - Even regular ol' safe code without optimizations could cause different arrangements in memory even if a provided type is empty.
+
+```rust
+struct Wrapper<T: SneakyTrait> {
+    item: T::Sneaky,
+    iter: PhantomData<T>,
+}
+
+trait SneakyTrait {
+    type Sneaky;
+}
+impl SneakyTrait for PhantomData<u8> {
+    type Sneaky = ();
+}
+impl SneakyTrait for PhantomData<i8> {
+    type Sneaky = [u8; 1024];
+}
+```
+
+Although it is error-prone, you can still cast between types in Rust, just make sure you:
+1. Guarantee the memory representation somehow,
+2. Try to control all the types involved (if not, be cognizant of pitfalls)
+
+
+## Tips for writing Unsafe code
+- Make sure to handle `unsafe` code with care.  But don't be afraid - in a lot of circumstances, it's not too difficult to write sound code.
+- Be sure that there isn't a safe implementation before resorting to `unsafe`.
+- It's tempting to think that you only need to be vigilant in and around the `unsafe` keyword and `unsafe` blocks.  **THIS IS NOT TRUE**.  It is entirely possible for a safe implementation of code to cause previously written unsafe code to no longer be sound.
+    - Look for safety only at the _privacy boundary_ of all code that relates to the unsafe block.
+    - Where _privacy boundary_ means "any part of your code that can fiddle with the unsafe bits".
+
+```rust
+// module is bar/mod.rs
+// this file is bar/foo.rs
+pub struct Foo;
+
+// If safety of unsafe code related to Foo depends on Foo not implementing
+// particular traits or methods with particular signatures, recheck the
+// safety of all unsafe blocks and keywords any time you implement a trait
+// for Foo.
+// Since users of your library may mess this up, the safety
+// invariants should be strongly documented.
+```
+
+```rust
+// module is bar/mod.rs
+// this file is bar/foo.rs
+pub(crate) struct Foo;
+
+// If it was just pub(crate), then you'd only have to re-check for
+// safety concerns within the same crate.
+```
+
+```rust
+// module is bar/mod.rs
+// this file is bar/foo.rs
+struct Foo;
+
+// Even better - if the Foo is private to this module, then you only
+// need to re-check for safety within the same module (and any submodules).
+```
+
+- It is best to encapsulate `unsafe` code as much as possible.
+    - Provide unsafety in the form of a single module and give that module an interface that is entirely safe.
+    - Stick the unsafety in its own crate, so you don't accidentally leave any holes for `unsafe` code to lose its soundness.
+    - Give them names that clearly communicate that care is needed, then document rigorously.
+    - Don't sacrifice the `unsafe` keyword marker just to avoid the "noise" that it makes in your code.
+    - Always document what conditions makes your `unsafe` function safe to call.
+    - Always document the invariants that a given function expects to be upheld, even if they're already written elsewhere.  It's safe to assume documentation is read in an ad-hoc manner, not as prose.
+
+- Additional `unsafe` code-writing tips:
+    - Read the [Rustonomicon](https://doc.rust-lang.org/nomicon/) cover-to-cover.
+    - Add a set of tools to your CI pipeline.
+        - Use `miri` (Mid-level Intermediate Representation Interpreter).  This tool interprets the Rust code directly.
+        - Use `AddressSanitizer` (written by Google), which detects a large number of memory errors, i.e., use-after-free, buffer overflows, memory leaks, etc.
+    - Sprinkle assertions throughout your unsafe code.  A panic is better than UB.
+        - If concerned about runtime cost, make use of `debug_assert*` macros and the `if cfg!(debug_assertions) || cfg!(test)` constructs for the debug and test contexts.
+
+
+
+
+
 

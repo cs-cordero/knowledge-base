@@ -6,6 +6,8 @@
 - [Interface Design](rust/interface_design.md)
 - [Error Handling](rust/error_handling.md)
 - [Unsafe Rust](rust/unsafe_rust.md)
+- [Asynchronous Rust](rust/async_rust.md)
+- [Parallel Rust](rust/parallelism.md)
 
 # Game Engine Programming
 - [Animation Systems](game_engine_programming/animation.md)
