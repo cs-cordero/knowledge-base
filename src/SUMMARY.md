@@ -8,6 +8,7 @@
 - [Unsafe Rust](rust/unsafe_rust.md)
 - [Asynchronous Rust](rust/async_rust.md)
 - [Parallel Rust](rust/parallelism.md)
+- [Ownership](rust/ownership.md)
 
 # Game Engine Programming
 - [Animation Systems](game_engine_programming/animation.md)
@@ -54,3 +55,6 @@
 
 # Java
 - [Unhandled Exceptions](java/java_unhandled_exceptions.md)
+
+# Networking
+- [OSI Model](networking/osi_model.md)
