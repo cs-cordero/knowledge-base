@@ -54,6 +54,9 @@
     - [Reflections and Refractions](linear_algebra/ray_reflections_refractions.md)
 
 # Java
+- [Effective Java](java/effective_java.md)
+    - [Introduction](java/effective_java_ch1.md)
+    - [Creating and Destroying Objects](java/effective_java_ch2.md)
 - [Unhandled Exceptions](java/java_unhandled_exceptions.md)
 
 # Networking
