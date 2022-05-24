@@ -57,6 +57,7 @@
 - [Effective Java](java/effective_java.md)
     - [Introduction](java/effective_java_ch1.md)
     - [Creating and Destroying Objects](java/effective_java_ch2.md)
+    - [Methods Common to All Objects](java/effective_java_ch3.md)
 - [Unhandled Exceptions](java/java_unhandled_exceptions.md)
 
 # Networking
