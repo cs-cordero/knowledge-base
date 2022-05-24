@@ -292,34 +292,3 @@ static String firstLineOfFile(String path) throws IOException {
 **Why?**
 1. Exceptions may be thrown in either the `try` block or the `finally` block.  If they happen in both, then the exception in the `finally` block blows out the first.  There is no record of the first exception ever occurring.
     * `try-with-resources` works in the opposite way: the first is preferred over the second.
-
-### Additional Notes
-**Covariant return typing**.  When a subtype implementation overrides a method to return a subtype of the extending type.  For example, the builder on the abstract `Pizza` class returns a `Pizza` on its `build` method.  The implementing `NyPizza` concrete class overrides this method but returns a `NyPizza` class, which is a subtype of `Pizza`.
-
-**Generic type with recursive type parameter**.  A workaround for the fact that Java lacks a "self" type.  This is also known as the "simulated self-type" idiom.  It looks like this: `class Builder<T extends Builder<T>>`.
-
-**Telescoping constructor pattern**.  An anti-pattern in which you provide a constructor with only the required parameters, a second with a single optional parameter, a third with a second optional parameter, and so on until you have a constructor with all optional parameters.
-
-**JavaBean**. A class definition that follows the [JavaBean standard](http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html).  Essentially:
-1. The class should set all of its properties to be `private` and only accessible via `getters/setters`.
-1. The class should have a public **no-argument** constructor.  This means that properties will either get a default value or, more likely, set to null.
-1. The class should implement `Serializable`.
-
-**Primitives**.  `java.lang` defines 8 primitive types that have their own reserved keywords:
-1. `byte`. 8-bit signed two's complement integer.
-1. `short`. 16-bit signed two's complement integer.
-1. `int`. 32-bit signed two's complement integer.  Java 8 allows you to represent unsigned integers.
-1. `long`.  64-bit two's complement integer.  Java 8 allows you to represent unsigned integers.
-1. `float`. 32-bit IEEE 754 floating point number.
-1. `double`. 64-bit IEEE 754 floating point number.
-1. `boolean`. Represents true or false, but its actual "size" isn't precisely defined.
-1. `char`. A single 16-bit Unicode "character".
-
-**Objects**.  Distinct from primitives.  They must define regions of memory that consist of (1) state and (2) behavior.  Objects store their state in _fields_ (aka variables) and their behavior through _methods_ (aka functions).
-    * In Java, all objects are heap-allocated.  Unlike Rust, there is no way to specify a stack-allocated object.
-    * In contrast, a locally defined primitive value is generally held on a stack, unless it is owned by an object, in which case it is of course colocated with the object on the heap.
-
-**Boxed Primitives**.  Object-versions of primitive data types, i.e., `Integer` is the boxed version of `int`.  They hold a value of that primitive data type.  Why does Java have boxed primitives?  You can get all the benefits of using objects:  integer variables can have methods and can be passed to functions/classes that accept objects.  For example, `List` cannot contain any `int` or primitive data types, they must be boxed.
-* Boxed primitives are stored on the heap.
-* Unless you need the features, **you should prefer primitives over boxed**.  Doing so avoids unnecessary heap allocations and garbage cleanup.
-* Java has a feature since Java 5 called **Autoboxing** and **Unboxing** which handles the automatic type conversion to/from primitives to their boxed primitive equivalents.

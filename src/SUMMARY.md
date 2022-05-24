@@ -59,6 +59,8 @@
     - [Creating and Destroying Objects](java/effective_java_ch2.md)
     - [Methods Common to All Objects](java/effective_java_ch3.md)
 - [Unhandled Exceptions](java/java_unhandled_exceptions.md)
+- [Build Systems](java/build_systems.md)
+- [Concepts](java/concepts.md)
 
 # Networking
 - [OSI Model](networking/osi_model.md)
