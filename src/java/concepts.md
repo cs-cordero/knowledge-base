@@ -88,3 +88,11 @@ A class is said to be _instance-controlled_ if the class maintains strict contro
 1. Singletons
 1. Noninstantiables.  Typically instance controlled classes have a private constructor and then static methods for when programmers want to get an instance of the class.  The class itself will decide how an instance is returned, and oftentimes may reuse the object.
 1. Immutables.  When an immutable value class is instance-controlled, it can guarantee that equality is the same as logical equally and the same as object identity.
+
+## Constructor Chaining
+
+A given class may have one or more constructors.  Calling a constructor from within another constructor is called "constructor chaining".  This is performed _within_ a class (between its multiple constructors) by using `this(...)`.  This can also be performed by a subclass calling a constructor of its superclass by using `super(...)`.
+
+## Default Access
+
+When no visibility modifier is set on a member or top-level class or top-level interface, the default access is `package-private`, which means it is accessible from any class within the same package.  As an exception, interface members are `public` by default.

@@ -234,4 +234,126 @@ Any value/information contained in the string representation **should be program
 
 ## Override `clone` judiciously
 
+Be careful when overriding `clone`.
+
+### You are often better off providing an alternative means of copying (avoiding `clone` and `Cloneable`)
+
+You can provide a _copy constructor_ or a _copy factory_.
+
+```java
+// A Copy constructor
+public MyClass(MyClass foo) { ... }
+
+// A Copy factory
+public static MyClass newInstance(MyClass foo) { ... }
+```
+
+Given all the problems associated with `Cloneable`, new interfaces should not extend it and new classes should not implement it.
+
+The exception to this rule are arrays.  They are best copied with the `clone` method.
+
+### If you must implement `Cloneable` and `clone`...
+
 `Cloneable` is an interface intended to be used as a mixin interface.
+* It's an interface that doesn't define any methods.
+* The `clone` method is actually already defined as a `protected` method on `Object`.
+* Classes that override the `Object.clone` method but _don't_ implement `Cloneable` will throw a `CloneNotSupportedException`.
+* Similarly, classes that override `Cloneable` but _don't_ override `Object.clone` will also throw a `CloneNotSupportedException`.
+* This is a weird setup for Java and should not be emulated in user-defined interfaces.
+
+
+`clone` methods are expected to follow a complex, unenforceable, thinly documented protocol, which results in a fragile, dangerous, and _extralinguistic_ mechanism, since it creates objects without calling a constructor.
+
+The `clone` contract:
+* Creates and returns a copy of the object.  "Copy" meaning depends on the class of the object, but _usually_ (but not always) means:
+    * `x.clone() != x`
+    * `x.clone().getClass() == x.getClass()`
+    * `x.clone().equals(x)`
+    * By convention, the object returned should be obtained by calling `super.clone`.
+    * By convention, the object returned should be independent of the object being cloned.
+
+If a class's `clone` method returns an instance that is _not_ obtained by calling `super.clone`, but by calling a constructor, the compiler won't complain.  But if a subclass of that class calls `super.clone`, then the resulting object will have the wrong class.
+
+If a class that overrides `clone` is `final`, then this convention may be ignored.  But if it doesn't use `super.clone`, then it might as well not implement `Cloneable`, since it doesn't follow the contract.
+
+**Immutable classes should never provide a clone method**, it encourages wasteful copying.
+
+**The `clone` method functions as a constructor: you must ensure that it does no harm to the original object and that it properly establishes invariants on the clone.**
+
+**A `clone` method should never invoke an overridable method on the clone under construction.**
+
+Process for writing a well-functioning `clone` method.
+1. Update the class to implement `Cloneable`.
+1. Make the return type of `clone` something more specific than `Object` (a covariant return type)
+1. Wrap the function body in a `try-catch` block, because `clone` has a checked exception for `CloneNotSupportedException`.  But don't declare your method to _also_ throw `CloneNotSupportedException`.
+1. First, always call `super.clone` and cast it to the class you want.
+1. If the class fields are entirely primitives, then you're done!
+1. If the class contains some mutable object reference fields, you may need to clone those objects as well.
+    * Arrays for example may need to clone each of its elements.
+1. If the class contains some `final` object reference fields that need to be changed, you're kind of screwed.   **the `Cloneable` architecture is incompatible with normal use of final fields referring to object objects, except in cases where the objects may be safely shared between an object and its clone.**
+    * It may be necessary to remove `final` modifiers from some fields to make the class cloneable.
+
+## Consider implementing `Comparable`
+
+Unlike `Cloneable`, `Comparable` does bring with it a method: `compareTo`, which is _not_ defined on `Object`.
+
+`Comparable` implies that an object has a natural ordering.
+
+Why implement `Comparable`?
+* The object immediately becomes sortable.
+* The object can interoperate with many generic algorithms that rely on the `Comparable` interface.
+
+The general contract of `compareTo`:
+* Throw a `ClassCastException` if the given object's type prevents it from being compared to this object.
+* Return a negative integer, zero, or a positive integer if this object is less than, equal to, or greater than the given object.
+* **Symmetric**. `signum(x.compareTo(y)) == -signum(y.compareto(x))`
+* **Transitive**.  `x.compareTo(y) > 0 && y.compareTo(z) > 0` implies `x.compareTo(z) > 0`
+* `x.compareTo(y) == 0` implies `x.compareTo(z) == 0` and `y.compareTo(z) == 0` for all `z`.
+* It is strongly recommended that `x.compareTo(y) == 0` implies `x.equals(y) == true`
+
+It is **not** possible to extend an instantiable class with a new value component while preserving the `compareTo` contract, unless you are willing to forgo the benefits of OOP.
+* The solution is similar to the `equals` contract: use `composition` instead of `inheritance`.
+
+When writing a `compareTo` method on a class that has object references, be sure to call `compareTo` recursively for those object references.
+
+When writing a `compareTo` method on a class with primitive fields, used the boxed method `compare`, e.g., `Double.compare` to perform the comparison.
+
+If a field does not implement `Comparable` or you need a nonstandard ordering, using a `Comparator` instead.
+
+Java 8 comes with a set of _comparator construction methods_ that can be statically imported, i.e.:
+
+```java
+private static final Comparator<PhoneNumber> COMPARATOR =
+    comparingInt((PhoneNumber pn) -> pn.areaCode)
+        .thenComparingInt(pn -> pn.prefix)
+        .thenComparingInt(pn -> pn.lineNum);
+
+public int compareto(PhoneNumber pn) {
+    return COMPARATOR.compare(this, pn);
+}
+```
+
+DO NOT use the _difference_ between two values for the comparison.
+
+```java
+// DON'T DO THIS
+static Comparator<Object> hashCodeOrder = new Comparator<>() {
+    public int compare(Object o1, Object o2) {
+        return o1.hashCode() - o2.hashCode();
+    }
+}
+```
+
+This has non-deterministic due to integer overflow and if the values are floating point, then IEEE 754 can mess things up.  Use a static `compare` method or a comparator construction method instead.
+
+```java
+// These are better than the above
+static Comparator<Object> hashCodeOrder = new Comparator<>() {
+    public int compare(Object o1, Object o2) {
+        return Integer.compare(o1.hashCode(), o2.hashCode());
+    }
+}
+
+
+static Comparator<Object> hashCodeOrder = Comparator.comparingInt(o -> o.hashCode());
+```
