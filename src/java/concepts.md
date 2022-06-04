@@ -96,3 +96,9 @@ A given class may have one or more constructors.  Calling a constructor from wit
 ## Default Access
 
 When no visibility modifier is set on a member or top-level class or top-level interface, the default access is `package-private`, which means it is accessible from any class within the same package.  As an exception, interface members are `public` by default.
+
+## Binary Compatibility
+
+See [Stack Overflow](https://stackoverflow.com/questions/14973380/what-is-binary-compatibility-in-java#14973523)
+
+> Binary compatibility means that when you change you rclass, you do not need to recompile classes that use it.  For example, you removed or renamed a public or protected method from your `log-1.jar` library and released a new version as `log-2.jar`.  When users of your `log-1.jar` download the new version, it will break their apps when they try to use the missing methods.

@@ -167,3 +167,168 @@ The difference between the two is what happens when a class wants to implement t
 * `interface` is ideal for defining mixins.
 * `interface` allows for non-hierarchical type frameworks.
 * `interface` enables safe, powerful functionality enhancements via the _wrapper class_ pattern.
+
+_Skeletal implementation class_ go with interfaces.  The interface defines the type, perhaps providing some default methods, while the skeletel implementation class implements the remaining non-primitive interface methods atop the primitive interface methods.  Extending a skeletal implementation takes most of the work out of implementing an interface.  This is the _Template Method_ pattern.
+* By convention, skeletal implementation classes are called `AbstractInterface` where `Interface` is the name of the interface tehy implement.
+* Skeletal implementations can make it very easy for programmers to provide their own implementations of an interface.
+* Skeletal implementations provide the implementation assistance of abstract classes without imposing the severe constraints that abstract classes impose.  It is strictly optional for users to extend the skeleton class.  If it cannot do so, it can just implement the interface directly.
+* Classes implementing an interface can forward invocations of interface methods to a contained private inner class that extends the skeletal implementation.  This technique is known as _simulated multiple inheritance_.  It is closely related to the wrapper class idiom.
+
+```java
+// Skeletal implementation example
+
+interface Entry<K, V> {   // Map.Entry
+    K getKey();
+    V getValue();
+    V setValue(V value);
+    boolean equals(Object o);
+    int hashCode();
+    ...
+}
+
+
+// The convention is to call the skeletal implementation class "AbstractXXXX" where "XXXX" is the name of the interface.
+public abstract class AbstractMapEntry<K, V> implements Map.Entry<K, V> {
+    // If a subclass/interface-implementer wants to allow mutation, they have to override this, otherwise we
+    // have default behavior to not allow mutation.
+    @Override public V setValue(V value) {
+        throw new UnsupportedOperationException();
+    }
+
+    // implements the general contract of Map.Entry.equals
+    @Override public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Map.Entry))
+            return false;
+        Map.Entry<?,?> e = (Map.Entry) o;
+        return Objects.equals(e.getKey(), getKey()) && Objects.equals(e.getValue(), getValue());
+    }
+
+    // implements the general contract of Map.Entry.hashCode
+    @Override public int hashCode() {
+        return Objects.hashCode(getKey()) ^ Objects.hashCode(getValue());
+    }
+
+    @Override public String toString() {
+        return getKey() + "=" + getValue();
+    }
+}
+```
+
+The above skeletal implementation class `AbstractMapEntry` could not be defined entirely as an interface because `equals`, `hashCode`, and `toString` are prohibited from having default methods in interfaces.
+
+Skeletal implementations are designed to be extended/inherited, so you should follow all the rules outlined for designing classes for inheritance.
+
+**Simple implementation**s are a variant on skeletal implementations, but differ in that they are not `abstract`.  They provide the simplest possible working implementation of the interface, so it can be used on its own or be subclassed.
+
+## Design interfaces for posterity
+
+Prior to Java 8 it was impossible to add methods to an interface without breaking existing implementations, since existing implementations would not have the new method defined.
+
+You can define a default method when adding a method to an interface, which would indeed prevent breaking existing implementations, but in so doing, you are injecting new methods and behavior on existing implementations without their consent.
+* **It is not possible to write a default method that maintains all invariants of every conceivable implementation.**
+
+Default methods may allow compiles to succeed but fail at runtime.
+
+As a result, **using default methods to add new methods to existing interfaces should be avoided unless the need is critical**.  Default methods remain useful at the time the interface is being designed/created to ease the task of implementing the interface.
+
+## Use interfaces only to define types
+
+When a class implements an interface, the interface serves as a _type_ that can be used to refer to instances of the class.  The interface says something about what a client can do with instances of the class.
+* This expectation is broken by _constant interface_.  These are interfaces which contain no methods and only consists of static final fields, each exporting a constant.  Classes implement the interface to avoid having to qualify constant names with a class name.
+* **The constant interface pattern is a poor use of interfaces**.  If a class chooses to use a constant internally, it should be an implementation detail.  Implementing a constant interface causes this implementation detail to leak into the class's exported API.
+    * If in a future release, the class is modified so that it no longer needs the constants, it must still implmement the interface to ensure _binary compatibility_.  Removing the interface breaks _binary compatibility_ because all of the `static final`s are public (since everything on an interface is public), so clients which rely on their existence will break.
+
+If you want to export constants:
+1. If they are strongly tied to an existing class, define them on that class.
+2. If they are best viewed as members of an enumerated type, then define them on an enum.
+3. Otherwise, export them with a noninstantiable _utility class_.
+
+```java
+// Constants example
+
+public class PhysicalConstants {
+    private PhysicalConstants() { } // prevent instantiation
+    public static final double AVOGADROS_NUMBER = 6.022_140_857e23
+    public static final double BOLTZMANN_CONST = 1.380_648_52e-23
+    public static final double ELECTRON_MASS = 9.109_383_56e-31
+}
+```
+
+## Prefer class hierarchies to tagged classes
+
+Sometimes you'll discover a class with instances that come in two or more flavors and contain a _tag_ field to disambiguate which "flavor" the instance is.  For example:
+
+```java
+class Figure {
+    enum Shape { RECTANGLE, CIRCLE };
+
+    final Shape shape;  // the shape of this figure (the "tag")
+
+    double length;      // only used if shape == RECTANGLE
+    double width;       // only used if shape == RECTANGLE
+
+    double radius;      // only used if shape == CIRCLE
+
+    Figure(double radius) {
+        shape = Shape.CIRCLE;
+        this.radius = radius;
+    }
+
+    Figure(double length, double width) {
+        shape = Shape.RECTANGLE;
+        this.length = length;
+        this.width = width;
+    }
+
+    double area() {
+        switch (shape) {
+            case RECTANGLE:
+                return length * width;
+            case CIRCLE:
+                return Math.PI * (radius * radius);
+            default:
+                throw new AssertionError(shape);
+        }
+    }
+}
+```
+
+We call these **tagged classes** and they are NOT like TypeScript's discriminated unions, despite sort of looking like one.  Tagged classes, by contrast, suck:
+* They are verbose
+* They are error-prone (hard to maintain invariants)
+* They are inefficient (they have to do conditional switch logic everywhere)
+* They are wanna-be class hierarchies.  So just make them a class hierarchy.
+
+## Favor static member classes over nonstatic
+
+**Nested class**.  A nested class is a class defined within another class.  Nested classes should exist only to serve its enclosing class.  If it is more useful than that, then it should be its own top-level class.
+
+**Static member class**.  A type of nested class.  Think of this class as a ordinary class that just happens to be declared inside another class and has access to all the enclosing class's members, even private ones.  Static member classes are static members of the enclosing class and obeys the same accessibility rules.
+* It is common to use a static member class as a public helper class, but useful only in conjunction with its outer class.
+* Instances of these can exist in isolation from its enclosing class.
+* If you do not need access to the enclosing instance, _always_ use a `static` member class instead.
+* A common use case for a `private` version of these is to represent components of the object represented by the enclosing class.  For example, `Map` classes associate keys with values.  There may be internal `Entry` objects for each key-value pair in the map.  Each `Entry` is associated with a `Map`, but the `Entry`'s methods do not need access to the map itself.
+
+**Nonstatic member class**.  A type of nested class. Also known as an "inner class".  Each instance of a nonstatic member class is implicitly associated with an _enclosing instance_ of its containing class.  Nonstatic member class instance methods can invoke methods on the enclosing instance or obtain references to the enclosing instance using the _qualified this_ construct.
+* It is impossible to create an instance of a nonstatic member class without an enclosing instance.
+* The association between the nonstatic member class instance and its enclosing instance is defined at the time of instantiation and cannot be modified afterward.
+* A common use case for these is an _Adapter_ pattern where an instance of an outer class wants to be viewed as an instance of some unrelated class.  For example, a `Map` that wants to have a nonstatic member class for an `Iterator`.
+* If you do not need access to the enclosing instance, _always_ use a `static` member class instead.
+
+**Anonymous class**.  A type of nested class. Also known as an "inner class".  Has no name.  Not a member of its enclosing class.  It is simultaneously declared and instantiated at the point of use.  Anonymous classes are permitted anywhere where an expression is legal.  Anonymous classes have access to enclosing instances if and only if they occur in a nonstatic context.  They cannot have static members other than _constant variables_ (primitive `final`s or string fileds initialized to constant expressions)
+* Before lambdas were added to Java, these were the means of creating small function objects on the fly, but now lambdas are preferred.
+* A common use is in the implementation of static factory methods, e.g., `intArrayAsList`.
+
+**Local class**.  A type of nested class. Also known as an "inner class". Least frequently used of the above.  Can be declared anywhere a local variable can be declared and obeys the same scoping rules.  They can have names and be used repeatedly.  They cannot contain static members, and may have access to enclosing instances if they are defined in a nonstatic context.
+
+## Limit source files to a single top-level class
+
+There are risks to defining multiple top-level classes in a single source file.
+
+Defining multiple top-level classes in a source file makes it possible to provide multiple definitions for a class via a name collision.
+
+Source files are fed to the compiler one-by-one, so having them in separate files would prevent this from being able to compile if there were a name collision (which is a good thing)
+
+If you are tempted to put multiple top-level classes into a signle source file, consider using static member clases.
