@@ -102,3 +102,49 @@ When no visibility modifier is set on a member or top-level class or top-level i
 See [Stack Overflow](https://stackoverflow.com/questions/14973380/what-is-binary-compatibility-in-java#14973523)
 
 > Binary compatibility means that when you change you rclass, you do not need to recompile classes that use it.  For example, you removed or renamed a public or protected method from your `log-1.jar` library and released a new version as `log-2.jar`.  When users of your `log-1.jar` download the new version, it will break their apps when they try to use the missing methods.
+
+
+## Type Erasure & Reification
+
+**Type erasure** refers to what the Java compiler does to generic type parameters as part of compilation.  Parameterized types are type checked at compile-time, then converted to raw types and execution-time casts.  Inferred types (like for wildcards) are also type erased.
+
+```
+// Source code written this way...
+List<String> list = new ArrayList<String>();
+list.add("hi");
+String x = list.get(0);
+
+// will be type checked, then compiled (basically) into:
+List list = new ArrayList();
+list.add("hi");
+String x = (String) list.get(0);
+```
+
+Type erasure was implemented for Java for backwards compatibility for generics from before parameterized types were added.
+
+A **Reified** type is a type that maintains its type information from source through compile time and exists at runtime.  As a result, any type that is subject to type erasure is considered a **non-reified** type.
+* Arrays, despite being "generic" syntactically since they're written like `String[]` or `Integer[]`, are actually reified, which is partly why they don't interop well with generic code.
+
+Type erasure is also why you can't have generic method overloading:
+
+```java
+// this is not possible
+void function(ArrayList<Integer> list) {}
+void function(ArrayList<String> list) {}
+void function(ArrayList<Float> list) {}
+
+// because they would all be type erased to their raw type:
+void function(ArrayList list) {}
+void function(ArrayList list) {}
+void function(ArrayList list) {}
+
+// and you can't define two different methods with the exact same signature.
+```
+
+## Heap pollution
+
+Generally, _heap pollution_ refers to any case where a reference to a given type `A` points to an object in memory that is actually of type `B`.
+
+Since the compiler inserts its own implicit type casts as part of compilation, you may get `ClassCastException` errors at runtime despite seeing no actual explicit casting occurring in the source code.
+
+Heap pollution often occurs at the boundary between generic and array code (combining reified and non-refied types), and when type erasure allows something to compile that would fail at runtime (i.e., relying on raw types).
