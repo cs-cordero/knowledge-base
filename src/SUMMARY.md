@@ -60,6 +60,7 @@
     - [Methods Common to All Objects](java/effective_java_ch3.md)
     - [Classes and Interfaces](java/effective_java_ch4.md)
     - [Generics](java/effective_java_ch5.md)
+    - [Enums and Annotations](java/effective_java_ch6.md)
 - [Unhandled Exceptions](java/java_unhandled_exceptions.md)
 - [Build Systems](java/build_systems.md)
 - [Concepts](java/concepts.md)
