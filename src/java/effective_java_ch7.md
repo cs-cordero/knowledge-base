@@ -156,3 +156,99 @@ Do not provide a method with multiple overloadings that take different functiona
 * Just don't write overloadings that take different functional interfaces in the same position.
 
 **You should design your APIs with lambdas in mind**.  Accept functional interface types on input and return them on output.
+
+## Use streams judiciously
+
+Streams were added in Java 8 to ease performing bulk operations sequentially or in parallel.
+
+There are two key abstractions:
+1. the _stream_: a finite or infinite sequence of data elements
+2. the _stream pipeline_:  a multistage computation on the elements on the stream
+
+Data elements can come from anywhere and can be object references or `int`, `long`, or `double`s.
+
+Stream pipelines are a source stream followed by zero or more _intermediate operations_ and one _terminal operation_.
+* Intermediate operations transform the stream in some way, mapping elements or filtering elements.  Intermediate operations transform the stream from one stream to another.
+* Terminal operations perform a final computation on the stream, such as storing its elements into a collection, returning a single element, or no elements at all, i.e., performing side effects like printing each element.
+* Stream pipelines are executed _lazily_.  Evaluation begins once the terminal operation is invoked.  Data elements unused in the terminal operation are never computed.  This means that streams are a no-op if they don't have a terminal operation.
+* By default, stream pipelines run sequentially.  They may run in parallel by invoking the `parallel` method.
+
+
+There's no hard and fast rules, but you shouldn't _always_ use a stream.  Sometimes imperative programming is more readable.
+
+**Overusing streams makes programs hard to read and maintain**.  Use good parameter names for your lambdas inside each intermediate operation.  Use helper methods for complex calculations to help with readability.
+
+**Do not use streams to process char values**. `"Hello world".chars()` confusingly returns a stream of `int` instead of `char`.
+
+There are things you can do from code blocks that you can't do from function objects:
+1. Code blocks may read and modify local variables in scope.  From a lambda you can only read `final` or effectively `final` variables, and you can't modify local variables.
+2. Code blocks can `return` from the enclosing method, `break` or `continue` an enclosing loop, or `throw` any checked exception.  From a lambda, you can do none of these things.
+
+If you have to do any of these things, then streams are not a good fit.
+
+Streams are a good fit when you want to:
+* Uniformly transform sequences of elements
+* Filter sequences of elements
+* Combine sequences of elements using a single operation
+* Accumulate sequences of elements into a collection
+* Search a sequence of elements for an element satisfying some predicate
+
+## Prefer side-effect-free functions in streams
+
+Streams aren't just an API, it's a paradigm based on functional programming.  It's best to structure each intermediate operation as close as possible to a _pure function_ of the previous stage.  They should be free of side effects.
+
+Don't use `forEach` for anything other than to present the result of the computation.  Don't write lambdas that mutate state.  These are both bad code smells.
+* Author says its okay to use `forEach` to append to an existing collection.
+
+```java
+// DON'T DO THIS:
+Map<String, Long> freq;
+try (Stream<String> words = new Scanner(file).tokens()) {
+    words.forEach(word -> {
+        freq.merge(word.toLowerCase(), 1L, Long::sum);
+    });
+}
+
+// DO THIS INSTEAD;
+Map<String, Long> freq;
+try (Stream<String> words = new Scanner(file).tokens()) {
+    freq = words.collect(groupingBy(String::toLowerCase, counting()));
+}
+```
+
+The `Collectors` API has 39 methods, some of which have as many as 5 type parameters.  It'd be pretty hard to memorize these. But similar to functional interfaces, you can derive most of the benefit without memorizing everything.
+* Ignore the `Collector` interface and just think of a collector as a _reduction_ strategy.  As in a "reducer".
+
+**It is customary to statically import members of `Collectors` because it makes stream pipelines more readable**.
+
+There are three collectors to gather elements of a stream to an actual `Collection`
+1. `toList()`
+2. `toSet()`
+3. `toCollection(collectionFactory)`
+
+Most of the remaining collectors exist to assist with collecting into maps.
+* The simplest of them is `toMap(keyMapper, valueMapper)`.  If multiple stream elements map to the same key, it throws an `IllegalStateException`.
+* They get more complex in order to allow you to provide strategies for dealing with key collisions as the collector does its job.
+    * There is even a three-argument overload of `toMap`: `toMap(keyMapper, valueMapper, BinaryOperator<V>)`
+    * There is also a four-argument overload, adding a way to specify the particular map implementation: `toMap(keyMapper, valueMapper, BinaryOperator<V>, mapFactory)`
+    * There are variants available for `toConcurrentMap`, providing `ConcurrentHashMap` instances.
+* The `Collectors` API also provides `groupingBy` to produce maps from classifiers to collections of instances using a _classifier function_.
+    * The unary variant of `groupingBy` groups stream elements into `List`s of those elements, grouped by the classifier.
+    * The binary variant of `groupingBy` allows you, with the second parameter, to proovide a _downstream collector_ which specifies the type of collection to collect into, not just a `List`.  You can use `toSet` or `toCollection(collectionFactory)`.
+    * The ternary variant of `groupingBy` allows you to specify a map factory.
+    * There is also variants for `groupingByConcurrent` which run in parallel.
+    * There is also `partitioningBy`, which is rarely used, but it partitions the stream into two collections based on a `Predicate` parameter.
+* There a set of functions from the `Collectors` API that is _only_ intended for use as a downstream collector. These include:
+    * `counting()`
+    * `summing()`
+    * `averaging()`
+    * `summarizing()`
+    * All overloads of `reducing()`
+    * All overloads of `mapping()`
+    * All overloads of `filtering()`
+    * All overloads of `flatMapping()`
+    * All overloads of `collectingAndThen()`
+* Finally there are `Collectors` methods that do not involve collections:
+    * `minBy` and `maxBy`, which take a comparator and return the elemnt found by using the comparator.
+    * `joining`, which only operates on streams of `CharSequence` and produce a `String`.  It has many overloads as well.
+
