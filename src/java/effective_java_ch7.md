@@ -252,3 +252,70 @@ Most of the remaining collectors exist to assist with collecting into maps.
     * `minBy` and `maxBy`, which take a comparator and return the elemnt found by using the comparator.
     * `joining`, which only operates on streams of `CharSequence` and produce a `String`.  It has many overloads as well.
 
+## Prefer Collection to Stream as a return type
+
+Prior to Java 8:
+* For methods that returned a sequence of elements, the norm was a collection: `Collection`, `Set`, or `List`.
+* If the method was written specifically to enable iteration/for-each loops, then the norm was to return an `Iterable`.
+* If the method was written to return a sequence of primitives, then an array was used.
+
+With Java 8, we have streams.  So should we return streams from the return type?
+
+Clients can't iterate over them with a for-each loop, since `Stream` does not extend `Iterable`.
+
+As a result you may have to write adapter code like so:
+
+```java
+// This adapter helps you translate from Stream<E> to Iterable<E>
+public static <E> Iterable<E> iterableOf(Stream<E> stream) {
+    return stream::iterator;
+}
+
+for (ProcessHandle p : iterableOf(streamOfProcesses)) {
+    // do something
+}
+```
+
+On the flip side, if a method only returns an `Iterable`, clients cannot use stream pipeline APIs.
+
+As a result you may write adapter code to go in the opposite direction:
+
+```java
+// This adapter helps you translate from Iterable<E> to Stream<E>
+public static <E> Stream<E> streamOf(Iterable<E> iterable) {
+    return StreamSupport.stream(iterable.spliterator(), false);
+}
+```
+
+If you're writing application code destined to be used only in a stream pipeline, feel free to write your methods to return streams.  If they're destined to only be used for iteration, feel free to return iterables.
+
+Otherwise, if you're writing a public API, provide a way for users to do both: write stream pipelines and write for-each statements.
+
+`Collection` is a subtype of `Iterable` and has a `stream` method, so it provides access for both iteration and stream access.
+* **`Collection` or an appropriate subtype is generally the best return type for a public, sequence-returning method.**
+
+**Large sequences**.  The exception is to not store a large sequence in memory just to return it as a collection.
+* You can consider implementing a special-purpose collection.
+
+If in the future, Java is updated to allow `Stream` to extend `Iterable`, then feel free to return streams because they'll automatically handle both stream processing and iteration.
+
+## Use caution when making streams parallel
+
+**Parallelizing a stream pipeline is unlikely to increase its performance if the source is from `Stream.iterate`, or the intermediate operation `limit` is used.**
+* The default parallelization strategy assumes there's no harm in processing beyond `limit`, then discarding unneeded results.
+* Do not parallelize streams indiscriminately.
+
+**Performance gains from parallelism are best on streams over `ArrayList`, `HashMap`, `HashSet`, `ConcurrentHashMap`, arrays, `int` ranges, and `long` ranges.**
+* All of these can be accurately and cheaply split into subranges of any desired size.
+* They use an abstraction called a _Spliterator_.
+    * If you write your own `Stream`, `Iterable`, or `Collection`, you must override the `spliterator` method if you want decent parallel performance.  High-quality spliterators are difficult to get right.
+* They provide good-to-excellent _locality of reference_ when processed sequentially, meaning sequential element references are stored together in memory.  While the references have good locality of reference, the objects referred to by the references may be disparate, which reduces locality of reference.  Locality of reference is important for parallelizing bulk operations.
+
+A stream pipeline's terminal operation also affects parallelism.
+* If the terminal operation is inherently sequential, then parallelism gets undercut.
+* The best terminal operation are _reductions_, e.g., `min`, `max`, `count`, `sum`.
+* Also good are _short circuiting_ operations, e.g., `anyMatch`, `allMatch`, `noneMatch`.
+* `collect` is a form of a _mutable reduction_, because combining collections from the parallel threads is costly.
+
+Always remember parallelizing a stream is a performance optimization that you have to pay for by adhering to various contracts to make sure it works properly.  Normally parallel stream pipelines operate in a common fork-join pool, meaning a misbehaving pipeline can mess up the rest of the system.
+* Do not evena attempt to parallelize a stream pipeline unless you have good reason to believe that it will preserve the correctness of the calculation _and_ increase its speed.
