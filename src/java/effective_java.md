@@ -52,3 +52,11 @@ These are my notes reading the book _Effective Java_ by Joshua Bloch, Third Edit
 46. Prefer side-effect-free functions in streams
 47. Prefer Collection to Stream as a return type
 48. Use caution when making streams parallel
+49. Check parameters for validity
+50. Make defensive copies when needed
+51. Design method signatures carefully
+52. Use overloading judiciously
+53. Use varargs judiciously
+54. Return empty collections or arrays, not nulls
+55. Return optionals judiciously
+56. Write doc comments for all exposed API elements
