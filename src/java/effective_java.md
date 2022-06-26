@@ -60,3 +60,15 @@ These are my notes reading the book _Effective Java_ by Joshua Bloch, Third Edit
 54. Return empty collections or arrays, not nulls
 55. Return optionals judiciously
 56. Write doc comments for all exposed API elements
+57. Minimize the scope of local variables
+58. Prefer for-each loops to traditional for loops
+59. Know and use the libraries
+60. Avoid float and double if exact answers are required
+61. Prefer primitive types to boxed primitives
+62. Avoid strings where other types are more appropriate
+63. Beware the performance of string concatenation
+64. Refer to objects by their interfaces
+65. Prefer interfaces to reflection
+66. Use native methods judiciously
+67. Optimize judiciously
+68. Adhere to generally accepted naming conventions

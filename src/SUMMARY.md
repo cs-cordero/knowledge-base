@@ -63,6 +63,7 @@
     - [Enums and Annotations](java/effective_java_ch6.md)
     - [Lambdas and Streams](java/effective_java_ch7.md)
     - [Methods](java/effective_java_ch8.md)
+    - [General Programming](java/effective_java_ch9.md)
 - [Unhandled Exceptions](java/java_unhandled_exceptions.md)
 - [Build Systems](java/build_systems.md)
 - [Concepts](java/concepts.md)
