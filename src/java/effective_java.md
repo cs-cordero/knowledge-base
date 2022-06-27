@@ -72,3 +72,12 @@ These are my notes reading the book _Effective Java_ by Joshua Bloch, Third Edit
 66. Use native methods judiciously
 67. Optimize judiciously
 68. Adhere to generally accepted naming conventions
+69. Use exceptions only for exceptional conditions
+70. Use checked exceptions for recoverable conditions and runtime exceptions for programming errors
+71. Avoid unnecessary use of checked exceptions
+72. Favor the use of standard exceptions
+73. Throw exceptions appropriate to the abstraction
+74. Document all exceptions thrown by each method
+75. Include failure-capture information in detail messages
+76. Strive for failure atomicity
+77. Don't ignore exceptions

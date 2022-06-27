@@ -148,3 +148,21 @@ Generally, _heap pollution_ refers to any case where a reference to a given type
 Since the compiler inserts its own implicit type casts as part of compilation, you may get `ClassCastException` errors at runtime despite seeing no actual explicit casting occurring in the source code.
 
 Heap pollution often occurs at the boundary between generic and array code (combining reified and non-refied types), and when type erasure allows something to compile that would fail at runtime (i.e., relying on raw types).
+
+## Exception translation
+
+Exception translation is the process of taking a lower-level exception and _translating_ it to a new exception class.  Often times this can be done using _exception chaining_, which is the process of identifying the `cause` of the higher-level exception as the lower-level exception.
+
+Programmers do this because to avoid propagating the lower-level exception and provide a more descriptive higher level exception that is less likely to confuse clients.
+
+```java
+try {
+    ...
+} catch (LowerLevelException e) {
+    throw HigherLevelException(e);
+}
+```
+
+## Failure atomicity
+
+An object is said to be _failure atomic_ if, when invoking a method that mutates the receiving object the object experiences a failure, that the object should be returned to the state that it was prior to the method invocation.
