@@ -81,3 +81,10 @@ These are my notes reading the book _Effective Java_ by Joshua Bloch, Third Edit
 75. Include failure-capture information in detail messages
 76. Strive for failure atomicity
 77. Don't ignore exceptions
+78. Synchronize access to shared mutable data
+79. Avoid excessive synchronization
+80. Prefer executors, tasks, and streams to threads
+81. Prefer concurrency utilities to `wait` and `notify`
+82. Document thread safety
+83. Use lazy initialization judiciously
+84. Don't depend on the thread scheduler
