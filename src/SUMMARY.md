@@ -66,6 +66,7 @@
     - [General Programming](java/effective_java_ch9.md)
     - [Exceptions](java/effective_java_ch10.md)
     - [Concurrency](java/effective_java_ch11.md)
+    - [Serialization](java/effective_java_ch12.md)
 - [Unhandled Exceptions](java/java_unhandled_exceptions.md)
 - [Build Systems](java/build_systems.md)
 - [Concepts](java/concepts.md)

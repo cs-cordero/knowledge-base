@@ -88,3 +88,9 @@ These are my notes reading the book _Effective Java_ by Joshua Bloch, Third Edit
 82. Document thread safety
 83. Use lazy initialization judiciously
 84. Don't depend on the thread scheduler
+85. Prefer alternatives to Java serialization
+86. Implement Serializable with great caution
+87. Consider using a custom serialized form
+88. Write readObject methods defensively
+89. For instance control, prefer enum types to readResolve
+90. Consider serialization proxies instead of serialized instances
