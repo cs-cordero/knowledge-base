@@ -10,7 +10,7 @@ These are my notes reading the book _Effective Java_ by Joshua Bloch, Third Edit
 4. Enforce noninstantiability with a private constructor
 5. Prefer dependency injection to hardwiring resources
 6. Avoid creating unnecessary objects
-7. Eliminate obsolete object references_
+7. Eliminate obsolete object references
 8. Avoid finalizers and cleaners
 9. Prefer `try-with-resources` to `try-finally`
 10. Obey the general contract when overriding `equals`
@@ -94,3 +94,53 @@ These are my notes reading the book _Effective Java_ by Joshua Bloch, Third Edit
 88. Write readObject methods defensively
 89. For instance control, prefer enum types to readResolve
 90. Consider serialization proxies instead of serialized instances
+
+## My personal summary of the above
+
+### Common Things To Do
+
+* Composition over inheritance
+* Use Static factory methods instead of constructors
+* Use Private constructors to prevent instantiability
+* Use the strictest accessibility modifier pssible.  Think hard before going from `private` to `protected`
+* Use getters and setters instead of public fields
+* Use `try-with-resources` for classes that implement `Autocloseable`
+* Prefer interfaces to abstract classes
+* Prefer method references to lambdas to anonymous classes
+* Prefer primitives to boxed types
+* Prefer `Collections` instead of streams
+* Look out for unnecessary and excessive autoboxing.  Mixing boxes with primitives auto-unboxes the boxes
+* If you override `equals`, override `hashCode` too
+* Override `toString`
+* Consistently use `@Override`
+* Favor using standard exceptions
+    * Chain exceptions if you end up using exception translation
+    * Use exceptions only for truly exceptional conditions, not for flow control.
+
+
+### Things To Do
+
+* Use the `Builder` pattern.  Perform validations on the final `build` step.
+* Use an enum type to enforce singleton-ness.
+* Use dependency injection
+* Strongly consider implementing `Comparable`
+* Make all your classes `final`, or else design your classes for inheritance.
+* Use interfaces instead of concrete types for parameters
+* Favor generics, but don't mix them with varargs or arrays.  Don't forget to use bounded wildcards
+* Enums
+    * Use `EnumSet` instead of bit fields
+    * Use `EnumMap` instead of ordinal indexing
+    * Allow clients to extend your enum by having your enum implement a public interface.
+* Use pure functions in stream pipelines.
+* Avoid function overloading, just use different function names it's not a big deal.
+* Doc comments.  Understand Javadoc
+
+### Never Do These Things
+
+* Never override `finalize`
+* Never implement a `Cleaner`
+* Never override `clone`.  The book gives a lesson for how to do it correctly, but just don't do it.  `clone` relies on an extralinguistic mechanism to do its job and requires you to follow a thinly documented contract.
+* Never use raw types
+* Never allow unchecked cast warnings to live
+* Never return `null` if the return type is an collection type.  In these cases, always return an empty collection.
+* Never rely on Java serialization.  If you must do so, be careful and re-read the relevant chapter.
